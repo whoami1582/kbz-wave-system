@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <title>KBZ Wave free money</title>
+  <style>
+    body { 
+      font-family: 'Pyidaungsu', sans-serif; 
+      background: #f5f5f5; 
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 95%;
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2, h3 { 
+      color: #2c3e50;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 8px 0;
+      width: 95%;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+    }
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover { background: #2980b9; }
+    button.success { background: #2ecc71; }
+    button.success:hover { background: #27ae60; }
+    button.danger { background: #e74c3c; }
+    button.danger:hover { background: #c0392b; }
+    button.warning { background: #f39c12; }
+    button.warning:hover { background: #d35400; }
+    button.info { background: #9b59b6; }
+    button.info:hover { background: #8e44ad; }
+    .panel { 
+      margin-top: 20px;
+      display: none;
+    }
+    .search-container {
+      margin: 15px 0;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .search-results {
+      font-family: monospace;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 8px;
+      background: white;
+      border-radius: 5px;
+      margin: 8px 0;
+      font-size: 13px;
+    }
+    .search-item {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      flex-wrap: wrap;
+    }
+    .stat-box {
+      background: #eaf2f8;
+      padding: 8px;
+      border-radius: 8px;
+      flex: 1;
+      margin: 5px;
+      min-width: 120px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #7f8c8d;
+    }
+    .error-message {
+      color: #e74c3c;
+      margin: 5px 0;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    .hidden-number {
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+    .search-status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .status-pending {
+      background-color: #f39c12;
+      color: white;
+    }
+    .status-active {
+      background-color: #2ecc71;
+      color: white;
+    }
+    .withdrawal-form {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+    }
+    .contact-info {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      background: #eaf2f8;
+      border-radius: 8px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        width: 98%;
+        padding: 10px;
+      }
+      input, button, select {
+        width: 100%;
+      }
+      .stat-box {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KBZ Wave ဖုန်းနံပါတ်ရှာဖွေရေးစနစ်</h1>
+    
+    <div id="loginPanel">
+      <div class="form-group">
+        <label for="username">အသုံးပြုသူအမည်</label>
+        <input type="text" id="username" placeholder="user nane (Admin free accoun)"/>
+      </div>
+      <div class="form-group">
+        <label for="password">လျှို့ဝှက်နံပါတ်</label>
+        <input type="password" id="password" placeholder="သင့်လျှို့ဝှက်နံပါတ်ထည့်ပါ" />
+      </div>
+      <button onclick="login()">လော့ဂ်အင်</button>
+      <div id="loginError" class="error-message"></div>
+    </div>
+
+    <div id="userPanel" class="panel">
+      <div class="result-box">
+        <div class="stats-container">
+          <div class="stat-box">
+            <div class="stat-label">ရှာဖွေပြီးနံပါတ်</div>
+            <div class="stat-value" id="foundNumbers">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">ယနေ့ရှာဖွေမှု</div>
+            <div class="stat-value" id="todaySearches">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">စုစုပေါင်းရှာဖွေမှု</div>
+            <div class="stat-value" id="totalSearches">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">ရရှိငွေ</div>
+            <div class="stat-value" id="totalEarned">0 MMK</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">ထုတ်ယူနိုင်ငွေ</div>
+            <div class="stat-value" id="availableBalance">0 MMK</div>
+          </div>
+        </div>
+        
+        <div id="userSearchStatus" class="search-status status-pending">
+          Admin မှခွင့်ပြုချက်ပေးရန် စောင့်ဆိုင်းနေပါသည်...
+        </div>
+      </div>
+      
+      <div class="withdrawal-form">
+        <h3>ငွေထုတ်ယူရန်</h3>
+        <div class="form-group">
+          <label for="withdrawPhone">KBZ Wave ဖုန်းနံပါတ်</label>
+          <input type="text" id="withdrawPhone" placeholder="09********" maxlength="11" />
+        </div>
+        <div class="form-group">
+          <label for="withdrawAmount">ထုတ်ယူမည့်ပမာဏ (MMK)</label>
+          <input type="number" id="withdrawAmount" placeholder="1000" min="100" step="100" />
+        </div>
+        <button class="info" onclick="requestWithdrawal()">ငွေထုတ်ယူမည်</button>
+        <div id="withdrawError" class="error-message"></div>
+      </div>
+      
+      <div class="search-container">
+        <h3>ရှာဖွေမှုရလဒ်များ</h3>
+        <div class="search-results" id="searchResults">
+          <div class="search-item">Admin မှအတည်ပြုပါက ရှာဖွေမှုစတင်မည်</div>
+        </div>
+      </div>
+      
+      <div class="contact-info">
+        <p>အကူအညီလိုပါက ဆက်သွယ်ရန်: <a href="https://t.me/Mynameiswhoami" target="_blank">Telegram</a></p>
+      </div>
+      
+      <button onclick="logout()">ထွက်မည်</button>
+    </div>
+
+    <div id="adminPanel" class="panel">
+      <div class="result-box">
+        <h3>Admin Panel</h3>
+        <div class="stats-container">
+          <div class="stat-box">
+            <div class="stat-label">စုစုပေါင်းအသုံးပြုသူ</div>
+            <div class="stat-value" id="totalUsers">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">ယနေ့ရှာဖွေမှု</div>
+            <div class="stat-value" id="adminTodaySearches">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">စုစုပေါင်းရှာဖွေမှု</div>
+            <div class="stat-value" id="adminTotalSearches">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">စုစုပေါင်းပေးချေငွေ</div>
+            <div class="stat-value" id="totalPaid">0 MMK</div>
+          </div>
+        </div>
+      </div>
+      
+      <h3>ရှာဖွေမှုခွင့်ပြုချက်</h3>
+      <div class="form-group">
+        <label for="searchUser">အသုံးပြုသူ</label>
+        <select id="searchUser">
+          <option value="">-- အသုံးပြုသူရွေးချယ်ပါ --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="searchPrefix">ရှာဖွေရန်နံပါတ်အစ (ဥပမာ 6*******)</label>
+        <input type="text" id="searchPrefix" placeholder="ဂဏန်း 1လုံးထည့်ပါ (6,7,9)" maxlength="1" />
+      </div>
+      <div class="form-group">
+        <label for="searchDuration">ရှာဖွေမှုကြာချိန် (မိနစ်)</label>
+        <input type="number" id="searchDuration" placeholder="5" min="1" max="60" />
+      </div>
+      <div class="form-group">
+        <label for="rewardAmount">ပေးချေမည့်ပမာဏ (MMK)</label>
+        <input type="number" id="rewardAmount" placeholder="1000" min="100" step="100" />
+      </div>
+      
+      <button class="success" onclick="approveSearch()">ရှာဖွေမှုခွင့်ပြုမည်</button>
+      <button class="danger" onclick="stopSearch()" style="margin-left: 10px;">ရှာဖွေမှုရပ်မည်</button>
+      
+      <h3>ငွေထုတ်ယူမှုခွင့်ပြုချက်</h3>
+      <div class="search-container">
+        <div class="search-results" id="withdrawalRequests">
+          <div class="search-item">ငွေထုတ်ယူမှုတောင်းဆိုချက်မရှိသေးပါ</div>
+        </div>
+      </div>
+      
+      <h3>Admin Tools</h3>
+      <div class="form-group">
+        <label for="newUsername">အသုံးပြုသူအသစ်အမည်</label>
+        <input type="text" id="newUsername" placeholder="အသုံးပြုသူအသစ်အမည်" />
+      </div>
+      <div class="form-group">
+        <label for="newPassword">လျှို့ဝှက်နံပါတ်</label>
+        <input type="password" id="newPassword" placeholder="လျှို့ဝှက်နံပါတ်" />
+      </div>
+      <button class="success" onclick="createUser()">အသုံးပြုသူအသစ်ဖန်တီးမည်</button>
+      
+      <h3>အသုံးပြုသူများ</h3>
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>အသုံးပြုသူ</th>
+            <th>ရှာဖွေပြီးနံပါတ်</th>
+            <th>ရရှိငွေ</th>
+            <th>ထုတ်ယူနိုင်ငွေ</th>
+            <th>လုပ်ဆောင်ချက်</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      
+      <h3>ငွေပေးချေမှုမှတ်တမ်း</h3>
+      <table id="paymentHistory">
+        <thead>
+          <tr>
+            <th>အသုံးပြုသူ</th>
+            <th>နံပါတ်</th>
+            <th>ပမာဏ</th>
+            <th>ရက်စွဲ</th>
+            <th>အချိန်</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      
+      <h3>ငွေထုတ်ယူမှုမှတ်တမ်း</h3>
+      <table id="withdrawalHistory">
+        <thead>
+          <tr>
+            <th>အသုံးပြုသူ</th>
+            <th>ဖုန်းနံပါတ်</th>
+            <th>ပမာဏ</th>
+            <th>အခြေအနေ</th>
+            <th>ရက်စွဲ</th>
+            <th>လုပ်ဆောင်ချက်</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      
+      <button class="danger" onclick="clearAllData()" style="margin-top: 20px;">ဒေတာများအားလုံးဖျက်မည်</button>
+      <button onclick="logout()">ထွက်မည်</button>
+    </div>
+  </div>
+
+  <script>
+    // Initialize data
+    function initializeData() {
+      if(!localStorage.getItem("kbzWaveSystem")) {
+        const initialData = {
+          admin: {
+            username: "whoamiqwertyuiop",
+            password: "admin123"
+          },
+          users: {},
+          payments: [],
+          withdrawals: [],
+          searchHistory: [],
+          activeSearches: {},
+          settings: {
+            lastSearchDate: new Date().toLocaleDateString()
+          }
+        };
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(initialData));
+      }
+    }
+
+    initializeData();
+
+    let currentUser = null;
+    let searchInterval = null;
+    let currentSearchPrefix = null;
+    let currentSearchUser = null;
+    let currentRewardAmount = 0;
+    let searchEndTime = null;
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      
+      if(username === system.admin.username && password === system.admin.password) {
+        // Admin login
+        currentUser = "admin";
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        loadAdminData();
+        
+        // Check for any active searches
+        checkActiveSearches();
+      } else if(system.users[username] && system.users[username].password === password) {
+        // User login
+        currentUser = username;
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("userPanel").style.display = "block";
+        updateUserStats();
+        
+        // Check if user has active search permission
+        checkUserSearchPermission();
+      } else {
+        document.getElementById("loginError").innerText = "အသုံးပြုသူအမည် သို့မဟုတ် လျှို့ဝှက်နံပါတ် မှားနေပါသည်";
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      if(searchInterval) {
+        clearInterval(searchInterval);
+        searchInterval = null;
+      }
+      document.getElementById("loginPanel").style.display = "block";
+      document.getElementById("userPanel").style.display = "none";
+      document.getElementById("adminPanel").style.display = "none";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("loginError").innerText = "";
+    }
+
+    function loadAdminData() {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      
+      // Load users
+      const userSelect = document.getElementById("searchUser");
+      userSelect.innerHTML = '<option value="">-- အသုံးပြုသူရွေးချယ်ပါ --</option>';
+      
+      const usersTable = document.querySelector("#usersTable tbody");
+      usersTable.innerHTML = "";
+      
+      let totalUsers = 0;
+      let todaySearches = 0;
+      let totalSearches = 0;
+      let totalPaid = 0;
+      
+      Object.keys(system.users).forEach(username => {
+        totalUsers++;
+        
+        // Calculate user earnings
+        const userPayments = system.payments.filter(p => p.user === username);
+        const userEarnings = userPayments.reduce((sum, p) => sum + p.amount, 0);
+        
+        // Calculate user withdrawals
+        const userWithdrawals = system.withdrawals.filter(w => w.user === username && w.status === "completed");
+        const withdrawnAmount = userWithdrawals.reduce((sum, w) => sum + w.amount, 0);
+        
+        const availableBalance = userEarnings - withdrawnAmount;
+        
+        todaySearches += system.users[username].todaySearches || 0;
+        totalSearches += system.users[username].totalSearches || 0;
+        totalPaid += userEarnings;
+        
+        // Add to user select
+        const option = document.createElement("option");
+        option.value = username;
+        option.textContent = username;
+        userSelect.appendChild(option);
+        
+        // Add to users table
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${username}</td>
+          <td>${system.users[username].totalSearches || 0}</td>
+          <td>${userEarnings} MMK</td>
+          <td>${availableBalance} MMK</td>
+          <td>
+            <button class="warning" onclick="editUser('${username}')">ပြင်မည်</button>
+            <button class="danger" onclick="deleteUser('${username}')">ဖျက်မည်</button>
+          </td>
+        `;
+        usersTable.appendChild(row);
+      });
+      
+      document.getElementById("totalUsers").innerText = totalUsers;
+      document.getElementById("adminTodaySearches").innerText = todaySearches;
+      document.getElementById("adminTotalSearches").innerText = totalSearches;
+      document.getElementById("totalPaid").innerText = totalPaid + " MMK";
+      
+      // Load payment history
+      const paymentTable = document.querySelector("#paymentHistory tbody");
+      paymentTable.innerHTML = "";
+      
+      system.payments.slice().reverse().forEach(payment => {
+        const row = document.createElement("tr");
+        const dateTime = new Date(payment.timestamp);
+        const timeString = dateTime.toLocaleTimeString();
+        const dateString = dateTime.toLocaleDateString();
+        
+        row.innerHTML = `
+          <td>${payment.user}</td>
+          <td class="hidden-number">${payment.prefix}*******</td>
+          <td>${payment.amount} MMK</td>
+          <td>${dateString}</td>
+          <td>${timeString}</td>
+        `;
+        paymentTable.appendChild(row);
+      });
+      
+      // Load withdrawal requests
+      const withdrawalRequests = document.getElementById("withdrawalRequests");
+      withdrawalRequests.innerHTML = "";
+      
+      const pendingWithdrawals = system.withdrawals.filter(w => w.status === "pending");
+      
+      if(pendingWithdrawals.length === 0) {
+        withdrawalRequests.innerHTML = '<div class="search-item">ငွေထုတ်ယူမှုတောင်းဆိုချက်မရှိသေးပါ</div>';
+      } else {
+        pendingWithdrawals.forEach(withdrawal => {
+          const row = document.createElement("div");
+          row.className = "search-item";
+          row.innerHTML = `
+            <strong>${withdrawal.user}</strong> - ${withdrawal.phone} - ${withdrawal.amount} MMK
+            <button class="success" style="float: right; padding: 2px 5px; font-size: 12px;" 
+              onclick="approveWithdrawal('${withdrawal.id}')">အတည်ပြုမည်</button>
+            <button class="danger" style="float: right; padding: 2px 5px; font-size: 12px; margin-right: 5px;" 
+              onclick="rejectWithdrawal('${withdrawal.id}')">ငြင်းပယ်မည်</button>
+          `;
+          withdrawalRequests.appendChild(row);
+        });
+      }
+      
+      // Load withdrawal history
+      const withdrawalTable = document.querySelector("#withdrawalHistory tbody");
+      withdrawalTable.innerHTML = "";
+      
+      system.withdrawals.slice().reverse().forEach(withdrawal => {
+        const row = document.createElement("tr");
+        const dateTime = new Date(withdrawal.timestamp);
+        const dateString = dateTime.toLocaleDateString();
+        
+        let statusColor = "";
+        if(withdrawal.status === "completed") statusColor = "color: #2ecc71;";
+        else if(withdrawal.status === "rejected") statusColor = "color: #e74c3c;";
+        else statusColor = "color: #f39c12;";
+        
+        row.innerHTML = `
+          <td>${withdrawal.user}</td>
+          <td>${withdrawal.phone}</td>
+          <td>${withdrawal.amount} MMK</td>
+          <td style="${statusColor}">${withdrawal.status}</td>
+          <td>${dateString}</td>
+          <td>
+            ${withdrawal.status === "pending" ? `
+              <button class="success" style="padding: 2px 5px; font-size: 12px;" 
+                onclick="approveWithdrawal('${withdrawal.id}')">အတည်ပြုမည်</button>
+              <button class="danger" style="padding: 2px 5px; font-size: 12px;" 
+                onclick="rejectWithdrawal('${withdrawal.id}')">ငြင်းပယ်မည်</button>
+            ` : ''}
+          </td>
+        `;
+        withdrawalTable.appendChild(row);
+      });
+    }
+
+    function updateUserStats() {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      const user = system.users[currentUser] || {};
+      
+      // Calculate user earnings
+      const userPayments = system.payments.filter(p => p.user === currentUser);
+      const userEarnings = userPayments.reduce((sum, p) => sum + p.amount, 0);
+      
+      // Calculate user withdrawals
+      const userWithdrawals = system.withdrawals.filter(w => w.user === currentUser && w.status === "completed");
+      const withdrawnAmount = userWithdrawals.reduce((sum, w) => sum + w.amount, 0);
+      
+      const availableBalance = userEarnings - withdrawnAmount;
+      
+      document.getElementById("foundNumbers").innerText = user.totalSearches || 0;
+      document.getElementById("todaySearches").innerText = user.todaySearches || 0;
+      document.getElementById("totalSearches").innerText = user.totalSearches || 0;
+      document.getElementById("totalEarned").innerText = userEarnings + " MMK";
+      document.getElementById("availableBalance").innerText = availableBalance + " MMK";
+      
+      // Load user's search history
+      const searchResults = document.getElementById("searchResults");
+      searchResults.innerHTML = "";
+      
+      (user.searchHistory || []).slice().reverse().forEach(search => {
+        const result = document.createElement("div");
+        result.className = "search-item";
+        result.textContent = `${search.date}: ${search.prefix}*******`;
+        searchResults.appendChild(result);
+      });
+      
+      if(user.searchHistory && user.searchHistory.length === 0) {
+        searchResults.innerHTML = '<div class="search-item">ရှာဖွေမှုရလဒ်မရှိသေးပါ</div>';
+      }
+    }
+
+    function checkUserSearchPermission() {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      const statusElement = document.getElementById("userSearchStatus");
+      
+      if(system.activeSearches[currentUser]) {
+        const searchData = system.activeSearches[currentUser];
+        const endTime = new Date(searchData.endTime);
+        const now = new Date();
+        
+        if(now < endTime) {
+          // Search is active
+          statusElement.className = "search-status status-active";
+          statusElement.innerHTML = `ရှာဖွေမှုခွင့်ပြုထားပါသည် (ကျန်ချိန်: ${Math.ceil((endTime - now) / 1000 / 60)} မိနစ်)`;
+          
+          // Start the search
+          startSearchForUser(
+            searchData.prefix, 
+            currentUser, 
+            searchData.rewardAmount,
+            endTime
+          );
+        } else {
+          // Search time expired
+          statusElement.className = "search-status status-pending";
+          statusElement.textContent = "Admin မှခွင့်ပြုချက်ပေးရန် စောင့်ဆိုင်းနေပါသည်...";
+          delete system.activeSearches[currentUser];
+          localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+        }
+      } else {
+        statusElement.className = "search-status status-pending";
+        statusElement.textContent = "Admin မှခွင့်ပြုချက်ပေးရန် စောင့်ဆိုင်းနေပါသည်...";
+      }
+    }
+
+    function checkActiveSearches() {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      const now = new Date();
+      
+      Object.keys(system.activeSearches).forEach(username => {
+        const endTime = new Date(system.activeSearches[username].endTime);
+        if(now >= endTime) {
+          delete system.activeSearches[username];
+        }
+      });
+      
+      localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+    }
+
+    function approveSearch() {
+      const username = document.getElementById("searchUser").value;
+      const prefix = document.getElementById("searchPrefix").value.trim();
+      const duration = parseInt(document.getElementById("searchDuration").value);
+      const amount = parseInt(document.getElementById("rewardAmount").value);
+      
+      if(!username) {
+        alert("ကျေးဇူးပြု၍ အသုံးပြုသူတစ်ဦးရွေးချယ်ပါ");
+        return;
+      }
+      
+      if(!prefix || !/^[0-9]$/.test(prefix)) {
+        alert("ကျေးဇူးပြု၍ မှန်ကန်သောနံပါတ်အစ (ဂဏန်း 1လုံး) ထည့်ပါ");
+        return;
+      }
+      
+      if(isNaN(duration) || duration < 1 || duration > 60) {
+        alert("ကျေးဇူးပြု၍ မှန်ကန်သောကြာချိန်ထည့်ပါ (1-60 မိနစ်)");
+        return;
+      }
+      
+      if(isNaN(amount)) {
+        alert("ကျေးဇူးပြု၍ မှန်ကန်သောငွေပမာဏထည့်ပါ");
+        return;
+      }
+      
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      const endTime = new Date();
+      endTime.setMinutes(endTime.getMinutes() + duration);
+      
+      system.activeSearches[username] = {
+        prefix: prefix,
+        rewardAmount: amount,
+        endTime: endTime.getTime(),
+        approvedBy: "admin",
+        approvedAt: new Date().toLocaleString()
+      };
+      
+      localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+      alert(`${username} အား ${duration} မိနစ်ကြာ ${prefix}******* နံပါတ်များရှာဖွေခွင့်ပြုပြီးပါပြီ`);
+      
+      // If the user is currently logged in, update their status
+      if(currentUser === username) {
+        checkUserSearchPermission();
+      }
+    }
+
+    function stopSearch() {
+      const username = document.getElementById("searchUser").value;
+      
+      if(!username) {
+        alert("ကျေးဇူးပြု၍ အသုံးပြုသူတစ်ဦးရွေးချယ်ပါ");
+        return;
+      }
+      
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      
+      if(system.activeSearches[username]) {
+        delete system.activeSearches[username];
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+        alert(`${username} ၏ ရှာဖွေမှုကိုရပ်ဆိုင်းပြီးပါပြီ`);
+        
+        // If the user is currently logged in, update their status
+        if(currentUser === username) {
+          if(searchInterval) {
+            clearInterval(searchInterval);
+            searchInterval = null;
+          }
+          document.getElementById("userSearchStatus").className = "search-status status-pending";
+          document.getElementById("userSearchStatus").textContent = "Admin မှခွင့်ပြုချက်ပေးရန် စောင့်ဆိုင်းနေပါသည်...";
+        }
+      } else {
+        alert("ဤအသုံးပြုသူအတွက် အသက်ဝင်သောရှာဖွေမှုမရှိပါ");
+      }
+    }
+
+    function startSearchForUser(prefix, username, rewardAmount, endTime) {
+      currentSearchPrefix = prefix;
+      currentSearchUser = username;
+      currentRewardAmount = rewardAmount;
+      searchEndTime = endTime;
+      
+      // Clear previous interval if exists
+      if(searchInterval) clearInterval(searchInterval);
+      
+      // Start searching
+      const searchResults = document.getElementById("searchResults");
+      searchResults.innerHTML = '<div class="search-item">ရှာဖွေမှုစတင်နေပါပြီ...</div>';
+      
+      let count = 0;
+      searchInterval = setInterval(() => {
+        // Check if search time has expired
+        const now = new Date();
+        if(now >= searchEndTime) {
+          clearInterval(searchInterval);
+          document.getElementById("userSearchStatus").className = "search-status status-pending";
+          document.getElementById("userSearchStatus").textContent = "Admin မှခွင့်ပြုချက်ပေးရန် စောင့်ဆိုင်းနေပါသည်...";
+          
+          // Remove from active searches
+          const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+          delete system.activeSearches[username];
+          localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+          
+          return;
+        }
+        
+        // Update remaining time
+        const remainingMinutes = Math.ceil((searchEndTime - now) / 1000 / 60);
+        document.getElementById("userSearchStatus").innerHTML = `ရှာဖွေမှုခွင့်ပြုထားပါသည် (ကျန်ချိန်: ${remainingMinutes} မိနစ်)`;
+        
+        count++;
+        
+        // Generate random 9-digit number with prefix
+        const randomNumber = currentSearchPrefix + 
+          Math.floor(10000000 + Math.random() * 89999999).toString();
+        
+        // Add to search results
+        const result = document.createElement("div");
+        result.className = "search-item";
+        result.textContent = `${new Date().toLocaleTimeString()}: ${currentSearchPrefix}*******`;
+        searchResults.prepend(result);
+        
+        // Limit to 50 results
+        if(searchResults.children.length > 50) {
+          searchResults.removeChild(searchResults.lastChild);
+        }
+        
+        // Every 100 searches, record a "found" number
+        if(count % 100 === 0) {
+          const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+          const today = new Date().toLocaleDateString();
+          
+          // Update user stats
+          if(!system.users[currentSearchUser]) {
+            system.users[currentSearchUser] = {
+              password: "default123",
+              searchHistory: [],
+              todaySearches: 0,
+              totalSearches: 0
+            };
+          }
+          
+          system.users[currentSearchUser].todaySearches++;
+          system.users[currentSearchUser].totalSearches++;
+          
+          // Add to user's search history
+          system.users[currentSearchUser].searchHistory.push({
+            prefix: currentSearchPrefix,
+            date: new Date().toLocaleString()
+          });
+          
+          // Record payment
+          system.payments.push({
+            user: currentSearchUser,
+            prefix: currentSearchPrefix,
+            amount: currentRewardAmount,
+            date: new Date().toLocaleDateString(),
+            timestamp: new Date().getTime(),
+            time: new Date().toLocaleTimeString()
+          });
+          
+          // Save data
+          localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+          
+          // Update UI
+          if(currentUser === "admin") {
+            loadAdminData();
+          } else {
+            updateUserStats();
+          }
+          
+          // Show success message
+          const successMsg = document.createElement("div");
+          successMsg.className = "search-item";
+          successMsg.style.color = "#2ecc71";
+          successMsg.style.fontWeight = "bold";
+          successMsg.textContent = `[အောင်မြင်ပြီး] ${currentSearchPrefix}******* အတွက် ${currentRewardAmount} MMK ရရှိပါသည်`;
+          searchResults.prepend(successMsg);
+        }
+      }, 10); // Search every 10ms (fast)
+    }
+
+    function requestWithdrawal() {
+      const phone = document.getElementById("withdrawPhone").value.trim();
+      const amount = parseInt(document.getElementById("withdrawAmount").value);
+      
+      if(!phone || !/^09[0-9]{9}$/.test(phone)) {
+        document.getElementById("withdrawError").innerText = "ကျေးဇူးပြု၍ မှန်ကန်သော KBZ Wave ဖုန်းနံပါတ်ထည့်ပါ";
+        return;
+      }
+      
+      if(isNaN(amount) || amount < 100) {
+        document.getElementById("withdrawError").innerText = "ကျေးဇူးပြု၍ မှန်ကန်သောငွေပမာဏထည့်ပါ (အနည်းဆုံး 100 MMK)";
+        return;
+      }
+      
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      
+      // Calculate user earnings
+      const userPayments = system.payments.filter(p => p.user === currentUser);
+      const userEarnings = userPayments.reduce((sum, p) => sum + p.amount, 0);
+      
+      // Calculate user withdrawals
+      const userWithdrawals = system.withdrawals.filter(w => w.user === currentUser && w.status === "completed");
+      const withdrawnAmount = userWithdrawals.reduce((sum, w) => sum + w.amount, 0);
+      
+      const availableBalance = userEarnings - withdrawnAmount;
+      
+      if(amount > availableBalance) {
+        document.getElementById("withdrawError").innerText = `သင့်တွင်လုံလောက်သောငွေမရှိပါ (လက်ရှိ: ${availableBalance} MMK)`;
+        return;
+      }
+      
+      // Create withdrawal request
+      const withdrawalId = 'w' + Date.now();
+      system.withdrawals.push({
+        id: withdrawalId,
+        user: currentUser,
+        phone: phone,
+        amount: amount,
+        status: "pending",
+        timestamp: new Date().getTime(),
+        date: new Date().toLocaleDateString()
+      });
+      
+      localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+      
+      document.getElementById("withdrawError").innerText = "";
+      document.getElementById("withdrawPhone").value = "";
+      document.getElementById("withdrawAmount").value = "";
+      
+      alert("ငွေထုတ်ယူမှုတောင်းဆိုချက်အောင်မြင်ပါသည်။ Admin မှအတည်ပြုပါက သင့်ဖုန်းနံပါတ်သို့ငွေလွှဲပါမည်။");
+      
+      // If admin is logged in, refresh the withdrawal requests
+      if(currentUser === "admin") {
+        loadAdminData();
+      } else {
+        updateUserStats();
+      }
+    }
+
+    function approveWithdrawal(withdrawalId) {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      const withdrawal = system.withdrawals.find(w => w.id === withdrawalId);
+      
+      if(withdrawal) {
+        withdrawal.status = "completed";
+        withdrawal.approvedAt = new Date().toLocaleString();
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+        alert(`ငွေထုတ်ယူမှုအတည်ပြုပြီးပါပြီ။ ${withdrawal.user} အား ${withdrawal.amount} MMK လွှဲပြီးပါပြီ။`);
+        loadAdminData();
+      }
+    }
+
+    function rejectWithdrawal(withdrawalId) {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      const withdrawal = system.withdrawals.find(w => w.id === withdrawalId);
+      
+      if(withdrawal) {
+        withdrawal.status = "rejected";
+        withdrawal.rejectedAt = new Date().toLocaleString();
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+        alert(`ငွေထုတ်ယူမှုငြင်းပယ်ပြီးပါပြီ။ ${withdrawal.user} အား အကြောင်းကြားပါမည်။`);
+        loadAdminData();
+      }
+    }
+
+    function createUser() {
+      const username = document.getElementById("newUsername").value.trim();
+      const password = document.getElementById("newPassword").value.trim();
+      
+      if(!username || !password) {
+        alert("ကျေးဇူးပြု၍ အသုံးပြုသူအမည်နှင့် လျှို့ဝှက်နံပါတ်ထည့်ပါ");
+        return;
+      }
+      
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+      
+      if(system.users[username]) {
+        alert("ဤအသုံးပြုသူအမည်ရှိပြီးသားဖြစ်သည်");
+        return;
+      }
+      
+      system.users[username] = {
+        password: password,
+        searchHistory: [],
+        todaySearches: 0,
+        totalSearches: 0
+      };
+      
+      localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+      alert("အသုံးပြုသူအသစ်ဖန်တီးမှုအောင်မြင်ပါသည်");
+      loadAdminData();
+    }
+
+    function editUser(username) {
+      const newPassword = prompt(`${username} ၏ လျှို့ဝှက်နံပါတ်အသစ်ထည့်ပါ`, "default123");
+      
+      if(newPassword !== null) {
+        const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+        system.users[username].password = newPassword;
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+        alert("ပြင်ဆင်မှုအောင်မြင်ပါသည်");
+      }
+    }
+
+    function deleteUser(username) {
+      if(confirm(`သေချာပါသလား? ${username} အား ဖျက်မည်။`)) {
+        const system = JSON.parse(localStorage.getItem("kbzWaveSystem"));
+        delete system.users[username];
+        
+        // Also remove any active searches for this user
+        if(system.activeSearches[username]) {
+          delete system.activeSearches[username];
+        }
+        
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+        loadAdminData();
+      }
+    }
+
+    function clearAllData() {
+      if(confirm("သေချာပါသလား? ဒေတာများအားလုံးဖျက်မည်။ ဤလုပ်ဆောင်ချက်ကို ပြန်လည်ရယူ၍မရပါ။")) {
+        localStorage.removeItem("kbzWaveSystem");
+        initializeData();
+        alert("ဒေတာများအားလုံးဖျက်ပြီးပါပြီ။ စနစ်ကိုပြန်လည်စတင်ပါမည်။");
+        location.reload();
+      }
+    }
+
+    // Reset daily counters if new day
+    function checkNewDay() {
+      const system = JSON.parse(localStorage.getItem("kbzWaveSystem") || "{}");
+      const today = new Date().toLocaleDateString();
+      
+      if(system.settings && system.settings.lastSearchDate !== today) {
+        // Reset daily counters for all users
+        Object.keys(system.users).forEach(username => {
+          system.users[username].todaySearches = 0;
+        });
+        
+        system.settings.lastSearchDate = today;
+        localStorage.setItem("kbzWaveSystem", JSON.stringify(system));
+      }
+    }
+
+    // Check for new day when page loads
+    window.onload = function() {
+      checkNewDay();
+    };
+  </script>
+</body>
+</html>
